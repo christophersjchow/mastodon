@@ -1,5 +1,5 @@
 diff --git a/Gemfile b/Gemfile
-index 355b7e43f..2e55393ec 100644
+index 6a72fec54..056ce0a5a 100644
 --- a/Gemfile
 +++ b/Gemfile
 @@ -18,6 +18,7 @@ gem 'makara', '~> 0.5'
@@ -7,62 +7,66 @@ index 355b7e43f..2e55393ec 100644
  gem 'dotenv-rails', '~> 2.8'
  
 +gem 'aws-sdk-rails', '~> 3'
- gem 'aws-sdk-s3', '~> 1.114', require: false
- gem 'fog-core', '<= 2.1.0'
+ gem 'aws-sdk-s3', '~> 1.117', require: false
+ gem 'fog-core', '<= 2.4.0'
  gem 'fog-openstack', '~> 0.3', require: false
 diff --git a/Gemfile.lock b/Gemfile.lock
-index b6e09e5df..d93521747 100644
+index d700e58c5..7a45df75f 100644
 --- a/Gemfile.lock
 +++ b/Gemfile.lock
-@@ -91,18 +91,39 @@ GEM
+@@ -91,18 +91,43 @@ GEM
      awrence (1.2.1)
      aws-eventstream (1.2.0)
-     aws-partitions (1.587.0)
-+    aws-record (2.9.0)
+     aws-partitions (1.670.0)
++    aws-record (2.10.1)
 +      aws-sdk-dynamodb (~> 1.18)
-     aws-sdk-core (3.130.2)
+     aws-sdk-core (3.168.2)
        aws-eventstream (~> 1, >= 1.0.2)
-       aws-partitions (~> 1, >= 1.525.0)
-       aws-sigv4 (~> 1.1)
-       jmespath (~> 1.0)
-+    aws-sdk-dynamodb (1.77.0)
-+      aws-sdk-core (~> 3, >= 3.127.0)
+       aws-partitions (~> 1, >= 1.651.0)
+       aws-sigv4 (~> 1.5)
+       jmespath (~> 1, >= 1.6.1)
++    aws-sdk-dynamodb (1.81.0)
++      aws-sdk-core (~> 3, >= 3.165.0)
 +      aws-sigv4 (~> 1.1)
-     aws-sdk-kms (1.56.0)
-       aws-sdk-core (~> 3, >= 3.127.0)
+     aws-sdk-kms (1.60.0)
+       aws-sdk-core (~> 3, >= 3.165.0)
        aws-sigv4 (~> 1.1)
-+    aws-sdk-rails (3.6.4)
++    aws-sdk-rails (3.7.0)
 +      aws-record (~> 2)
 +      aws-sdk-ses (~> 1)
++      aws-sdk-sesv2 (~> 1)
 +      aws-sdk-sqs (~> 1)
 +      aws-sessionstore-dynamodb (~> 2)
 +      concurrent-ruby (~> 1)
 +      railties (>= 5.2.0)
-     aws-sdk-s3 (1.114.0)
-       aws-sdk-core (~> 3, >= 3.127.0)
+     aws-sdk-s3 (1.117.2)
+       aws-sdk-core (~> 3, >= 3.165.0)
        aws-sdk-kms (~> 1)
        aws-sigv4 (~> 1.4)
-+    aws-sdk-ses (1.47.0)
-+      aws-sdk-core (~> 3, >= 3.127.0)
++    aws-sdk-ses (1.49.0)
++      aws-sdk-core (~> 3, >= 3.165.0)
 +      aws-sigv4 (~> 1.1)
-+    aws-sdk-sqs (1.51.1)
-+      aws-sdk-core (~> 3, >= 3.127.0)
++    aws-sdk-sesv2 (1.31.0)
++      aws-sdk-core (~> 3, >= 3.165.0)
++      aws-sigv4 (~> 1.1)
++    aws-sdk-sqs (1.53.0)
++      aws-sdk-core (~> 3, >= 3.165.0)
 +      aws-sigv4 (~> 1.1)
 +    aws-sessionstore-dynamodb (2.0.1)
 +      aws-sdk-dynamodb (~> 1)
 +      rack (~> 2)
-     aws-sigv4 (1.5.0)
+     aws-sigv4 (1.5.2)
        aws-eventstream (~> 1, >= 1.0.2)
      bcrypt (3.1.17)
-@@ -735,6 +756,7 @@ DEPENDENCIES
+@@ -762,6 +787,7 @@ DEPENDENCIES
    active_record_query_trace (~> 1.8)
    addressable (~> 2.8)
    annotate (~> 3.2)
 +  aws-sdk-rails (~> 3)
-   aws-sdk-s3 (~> 1.114)
+   aws-sdk-s3 (~> 1.117)
    better_errors (~> 2.9)
    binding_of_caller (~> 1.0)
-@@ -855,3 +877,9 @@ DEPENDENCIES
+@@ -885,3 +911,9 @@ DEPENDENCIES
    webpacker (~> 5.4)
    webpush!
    xorcist (~> 1.1)
@@ -72,69 +76,3 @@ index b6e09e5df..d93521747 100644
 +
 +BUNDLED WITH
 +   2.2.33
-diff --git a/config/environments/production.rb b/config/environments/production.rb
-index dc5319535..96b1ac40d 100644
---- a/config/environments/production.rb
-+++ b/config/environments/production.rb
-@@ -104,33 +104,37 @@ Rails.application.configure do
-   enable_starttls = nil
-   enable_starttls_auto = nil
- 
--  case ENV['SMTP_ENABLE_STARTTLS']
--  when 'always'
--    enable_starttls = true
--  when 'never'
--    enable_starttls = false
--  when 'auto'
--    enable_starttls_auto = true
-+  if ENV['SES_ENABLED'] == 'true'
-+    config.action_mailer.delivery_method = :ses
-   else
--    enable_starttls_auto = ENV['SMTP_ENABLE_STARTTLS_AUTO'] != 'false'
--  end
-+    case ENV['SMTP_ENABLE_STARTTLS']
-+    when 'always'
-+      enable_starttls = true
-+    when 'never'
-+      enable_starttls = false
-+    when 'auto'
-+      enable_starttls_auto = true
-+    else
-+      enable_starttls_auto = ENV['SMTP_ENABLE_STARTTLS_AUTO'] != 'false'
-+    end
- 
--  config.action_mailer.smtp_settings = {
--    :port                 => ENV['SMTP_PORT'],
--    :address              => ENV['SMTP_SERVER'],
--    :user_name            => ENV['SMTP_LOGIN'].presence,
--    :password             => ENV['SMTP_PASSWORD'].presence,
--    :domain               => ENV['SMTP_DOMAIN'] || ENV['LOCAL_DOMAIN'],
--    :authentication       => ENV['SMTP_AUTH_METHOD'] == 'none' ? nil : ENV['SMTP_AUTH_METHOD'] || :plain,
--    :ca_file              => ENV['SMTP_CA_FILE'].presence || '/etc/ssl/certs/ca-certificates.crt',
--    :openssl_verify_mode  => ENV['SMTP_OPENSSL_VERIFY_MODE'],
--    :enable_starttls      => enable_starttls,
--    :enable_starttls_auto => enable_starttls_auto,
--    :tls                  => ENV['SMTP_TLS'].presence && ENV['SMTP_TLS'] == 'true',
--    :ssl                  => ENV['SMTP_SSL'].presence && ENV['SMTP_SSL'] == 'true',
--  }
-+    config.action_mailer.smtp_settings = {
-+      :port                 => ENV['SMTP_PORT'],
-+      :address              => ENV['SMTP_SERVER'],
-+      :user_name            => ENV['SMTP_LOGIN'].presence,
-+      :password             => ENV['SMTP_PASSWORD'].presence,
-+      :domain               => ENV['SMTP_DOMAIN'] || ENV['LOCAL_DOMAIN'],
-+      :authentication       => ENV['SMTP_AUTH_METHOD'] == 'none' ? nil : ENV['SMTP_AUTH_METHOD'] || :plain,
-+      :ca_file              => ENV['SMTP_CA_FILE'].presence || '/etc/ssl/certs/ca-certificates.crt',
-+      :openssl_verify_mode  => ENV['SMTP_OPENSSL_VERIFY_MODE'],
-+      :enable_starttls      => enable_starttls,
-+      :enable_starttls_auto => enable_starttls_auto,
-+      :tls                  => ENV['SMTP_TLS'].presence && ENV['SMTP_TLS'] == 'true',
-+      :ssl                  => ENV['SMTP_SSL'].presence && ENV['SMTP_SSL'] == 'true',
-+    }
- 
--  config.action_mailer.delivery_method = ENV.fetch('SMTP_DELIVERY_METHOD', 'smtp').to_sym
-+    config.action_mailer.delivery_method = ENV.fetch('SMTP_DELIVERY_METHOD', 'smtp').to_sym
-+  end
- 
-   config.action_dispatch.default_headers = {
-     'Server'                 => 'Mastodon',
