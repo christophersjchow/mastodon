@@ -1,26 +1,26 @@
 diff --git a/Gemfile b/Gemfile
-index 6a72fec54..056ce0a5a 100644
+index 6e5292d82..21bbe31ed 100644
 --- a/Gemfile
 +++ b/Gemfile
 @@ -18,6 +18,7 @@ gem 'makara', '~> 0.5'
- gem 'pghero', '~> 2.8'
+ gem 'pghero'
  gem 'dotenv-rails', '~> 2.8'
  
 +gem 'aws-sdk-rails', '~> 3'
- gem 'aws-sdk-s3', '~> 1.117', require: false
+ gem 'aws-sdk-s3', '~> 1.119', require: false
  gem 'fog-core', '<= 2.4.0'
  gem 'fog-openstack', '~> 0.3', require: false
 diff --git a/Gemfile.lock b/Gemfile.lock
-index d700e58c5..7a45df75f 100644
+index 3bd2d591d..e7a26a4a4 100644
 --- a/Gemfile.lock
 +++ b/Gemfile.lock
 @@ -91,18 +91,43 @@ GEM
      awrence (1.2.1)
      aws-eventstream (1.2.0)
-     aws-partitions (1.670.0)
+     aws-partitions (1.701.0)
 +    aws-record (2.10.1)
 +      aws-sdk-dynamodb (~> 1.18)
-     aws-sdk-core (3.168.2)
+     aws-sdk-core (3.170.0)
        aws-eventstream (~> 1, >= 1.0.2)
        aws-partitions (~> 1, >= 1.651.0)
        aws-sigv4 (~> 1.5)
@@ -28,7 +28,7 @@ index d700e58c5..7a45df75f 100644
 +    aws-sdk-dynamodb (1.81.0)
 +      aws-sdk-core (~> 3, >= 3.165.0)
 +      aws-sigv4 (~> 1.1)
-     aws-sdk-kms (1.60.0)
+     aws-sdk-kms (1.62.0)
        aws-sdk-core (~> 3, >= 3.165.0)
        aws-sigv4 (~> 1.1)
 +    aws-sdk-rails (3.7.0)
@@ -39,7 +39,7 @@ index d700e58c5..7a45df75f 100644
 +      aws-sessionstore-dynamodb (~> 2)
 +      concurrent-ruby (~> 1)
 +      railties (>= 5.2.0)
-     aws-sdk-s3 (1.117.2)
+     aws-sdk-s3 (1.119.0)
        aws-sdk-core (~> 3, >= 3.165.0)
        aws-sdk-kms (~> 1)
        aws-sigv4 (~> 1.4)
@@ -58,15 +58,15 @@ index d700e58c5..7a45df75f 100644
      aws-sigv4 (1.5.2)
        aws-eventstream (~> 1, >= 1.0.2)
      bcrypt (3.1.17)
-@@ -762,6 +787,7 @@ DEPENDENCIES
+@@ -764,6 +789,7 @@ DEPENDENCIES
    active_record_query_trace (~> 1.8)
    addressable (~> 2.8)
    annotate (~> 3.2)
 +  aws-sdk-rails (~> 3)
-   aws-sdk-s3 (~> 1.117)
+   aws-sdk-s3 (~> 1.119)
    better_errors (~> 2.9)
    binding_of_caller (~> 1.0)
-@@ -885,3 +911,9 @@ DEPENDENCIES
+@@ -887,3 +913,9 @@ DEPENDENCIES
    webpacker (~> 5.4)
    webpush!
    xorcist (~> 1.1)
