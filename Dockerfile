@@ -1,4 +1,4 @@
-FROM tootsuite/mastodon:v4.1.0
+FROM tootsuite/mastodon:v4.1.1
 
 COPY 001-ses-support.patch /opt/mastodon
 
